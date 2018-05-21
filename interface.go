@@ -1,7 +1,6 @@
 package socketcan
 
 import (
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"time"
@@ -18,9 +17,15 @@ const (
 	SOL_CAN_RAW           = 101
 )
 
+const (
+	IF_TYPE_RAW   = 0
+	IF_TYPE_ISOTP = 1
+)
+
 type SocketCanInterface struct {
 	IfName   string
 	SocketFd int
+	ifType   int
 }
 
 func getIfIndex(fd int, ifName string) (int, error) {
@@ -54,105 +59,6 @@ func ioctlIfreq(fd int, ifreq *ifreqIndex) (err error) {
 		err = fmt.Errorf("ioctl: %v", errno)
 	}
 	return
-}
-
-func NewRawInterface(ifName string) (SocketCanInterface, error) {
-	canIf := SocketCanInterface{}
-
-	fd, err := unix.Socket(unix.AF_CAN, unix.SOCK_RAW, CAN_RAW)
-	if err != nil {
-		return canIf, err
-	}
-
-	ifIndex, err := getIfIndex(fd, ifName)
-	if err != nil {
-		return canIf, err
-	}
-
-	addr := &unix.SockaddrCAN{Ifindex: ifIndex}
-	if err = unix.Bind(fd, addr); err != nil {
-		return canIf, err
-	}
-
-	canIf.IfName = ifName
-	canIf.SocketFd = fd
-
-	return canIf, nil
-}
-
-func NewIsotpInterface(ifName string, rxID uint32, txID uint32) (SocketCanInterface, error) {
-	canIf := SocketCanInterface{}
-
-	fd, err := unix.Socket(unix.AF_CAN, unix.SOCK_DGRAM, CAN_ISOTP)
-	if err != nil {
-		return canIf, err
-	}
-
-	ifIndex, err := getIfIndex(fd, ifName)
-	if err != nil {
-		return canIf, err
-	}
-
-	addr := &unix.SockaddrCAN{Ifindex: ifIndex, RxID: rxID, TxID: txID}
-	if err = unix.Bind(fd, addr); err != nil {
-		return canIf, err
-	}
-
-	canIf.IfName = ifName
-	canIf.SocketFd = fd
-
-	return canIf, nil
-}
-
-func (i SocketCanInterface) SendFrame(f CanFrame) error {
-	// assemble a SocketCAN frame
-	frameBytes := make([]byte, 16)
-	// bytes 0-3: arbitration ID
-	binary.LittleEndian.PutUint32(frameBytes[0:4], uint32(f.ArbId))
-	// byte 4: data length code
-	frameBytes[4] = f.Dlc
-	// data
-	copy(frameBytes[8:], f.Data)
-
-	_, err := unix.Write(i.SocketFd, frameBytes)
-	return err
-}
-
-func (i SocketCanInterface) RecvFrame() (CanFrame, error) {
-	f := CanFrame{}
-
-	// read SocketCAN frame from device
-	frameBytes := make([]byte, 16)
-	_, err := unix.Read(i.SocketFd, frameBytes)
-	if err != nil {
-		return f, err
-	}
-
-	// bytes 0-3: arbitration ID
-	f.ArbId = int(binary.LittleEndian.Uint32(frameBytes[0:4]))
-	// byte 4: data length code
-	f.Dlc = frameBytes[4]
-	// data
-	f.Data = make([]byte, 8)
-	copy(f.Data, frameBytes[8:])
-
-	return f, nil
-}
-
-func (i SocketCanInterface) SendBuf(data []byte) error {
-	_, err := unix.Write(i.SocketFd, data)
-	return err
-}
-
-func (i SocketCanInterface) RecvBuf() ([]byte, error) {
-	data := make([]byte, 4095)
-	len, err := unix.Read(i.SocketFd, data)
-	if err != nil {
-		return data, err
-	}
-
-	// only return the valid bytes (0 to length received)
-	return data[:len], nil
 }
 
 func (i SocketCanInterface) SetLoopback(enable bool) error {

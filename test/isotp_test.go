@@ -97,3 +97,19 @@ func TestIsotpTxRxMultiFrame(t *testing.T) {
 	closeIsotpInterface(t, txDev)
 	closeIsotpInterface(t, rxDev)
 }
+
+func TestIsotpWrongFunctions(t *testing.T) {
+	dev := openIsotpInterface(t, 0x100, 0x200)
+
+	err := dev.SendFrame(socketcan.CanFrame{})
+	if err == nil {
+		t.Errorf("no error trying to SendFrame with isotp interface")
+	}
+
+	_, err = dev.RecvFrame()
+	if err == nil {
+		t.Errorf("no error trying to RecvFrame with raw interface")
+	}
+
+	closeRawInterface(t, dev)
+}
