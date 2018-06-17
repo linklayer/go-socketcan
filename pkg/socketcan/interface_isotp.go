@@ -6,8 +6,8 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func NewIsotpInterface(ifName string, rxID uint32, txID uint32) (SocketCanInterface, error) {
-	canIf := SocketCanInterface{}
+func NewIsotpInterface(ifName string, rxID uint32, txID uint32) (Interface, error) {
+	canIf := Interface{}
 	canIf.ifType = IF_TYPE_ISOTP
 
 	fd, err := unix.Socket(unix.AF_CAN, unix.SOCK_DGRAM, CAN_ISOTP)
@@ -31,7 +31,7 @@ func NewIsotpInterface(ifName string, rxID uint32, txID uint32) (SocketCanInterf
 	return canIf, nil
 }
 
-func (i SocketCanInterface) SendBuf(data []byte) error {
+func (i Interface) SendBuf(data []byte) error {
 	if (i.ifType != IF_TYPE_ISOTP) {
 		return fmt.Errorf("interface is not isotp type")
 	}
@@ -40,7 +40,7 @@ func (i SocketCanInterface) SendBuf(data []byte) error {
 	return err
 }
 
-func (i SocketCanInterface) RecvBuf() ([]byte, error) {
+func (i Interface) RecvBuf() ([]byte, error) {
 	if (i.ifType != IF_TYPE_ISOTP) {
 		return []byte{}, fmt.Errorf("interface is not isotp type")
 	}

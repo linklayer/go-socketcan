@@ -22,7 +22,7 @@ const (
 	IF_TYPE_ISOTP = 1
 )
 
-type SocketCanInterface struct {
+type Interface struct {
 	IfName   string
 	SocketFd int
 	ifType   int
@@ -61,7 +61,7 @@ func ioctlIfreq(fd int, ifreq *ifreqIndex) (err error) {
 	return
 }
 
-func (i SocketCanInterface) SetLoopback(enable bool) error {
+func (i Interface) SetLoopback(enable bool) error {
 	value := 0
 	if enable {
 		value = 1
@@ -70,7 +70,7 @@ func (i SocketCanInterface) SetLoopback(enable bool) error {
 	return err
 }
 
-func (i SocketCanInterface) SetRecvTimeout(timeout time.Duration) error {
+func (i Interface) SetRecvTimeout(timeout time.Duration) error {
 	tv := unix.Timeval{
 		Sec:  int64(timeout / time.Second),
 		Usec: int64(timeout % time.Second / time.Microsecond),
@@ -79,7 +79,7 @@ func (i SocketCanInterface) SetRecvTimeout(timeout time.Duration) error {
 	return err
 }
 
-func (i SocketCanInterface) SetSendTimeout(timeout time.Duration) error {
+func (i Interface) SetSendTimeout(timeout time.Duration) error {
 	tv := unix.Timeval{
 		Sec:  int64(timeout / time.Second),
 		Usec: int64(timeout % time.Second / time.Microsecond),
@@ -88,6 +88,6 @@ func (i SocketCanInterface) SetSendTimeout(timeout time.Duration) error {
 	return err
 }
 
-func (i SocketCanInterface) Close() error {
+func (i Interface) Close() error {
 	return unix.Close(i.SocketFd)
 }

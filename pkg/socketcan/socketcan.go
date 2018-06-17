@@ -1,7 +1,7 @@
 package socketcan
 
 type CanFrame struct {
-	ArbId    int
+	ArbId    uint32
 	Dlc      byte
 	Data     []byte
 	Extended bool

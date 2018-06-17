@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/linklayer/go-socketcan"
+	"github.com/linklayer/go-socketcan/pkg/socketcan"
 )
 
-func openRawInterface(t *testing.T) socketcan.SocketCanInterface {
+func openRawInterface(t *testing.T) socketcan.Interface {
 	dev, err := socketcan.NewRawInterface("vcan0")
 	if err != nil {
 		t.Errorf("could not create CAN device: %v", err)
@@ -16,7 +16,7 @@ func openRawInterface(t *testing.T) socketcan.SocketCanInterface {
 	return dev
 }
 
-func closeRawInterface(t *testing.T, dev socketcan.SocketCanInterface) {
+func closeRawInterface(t *testing.T, dev socketcan.Interface) {
 	err := dev.Close()
 	if err != nil {
 		t.Errorf("could not close CAN device: %v", err)

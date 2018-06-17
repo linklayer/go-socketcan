@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/linklayer/go-socketcan"
+	"github.com/linklayer/go-socketcan/pkg/socketcan"
 )
 
-func openIsotpInterface(t *testing.T, rxID uint32, txID uint32) socketcan.SocketCanInterface {
+func openIsotpInterface(t *testing.T, rxID uint32, txID uint32) socketcan.Interface {
 	dev, err := socketcan.NewIsotpInterface("vcan0", rxID, txID)
 	if err != nil {
 		t.Errorf("could not create CAN device: %v", err)
@@ -16,7 +16,7 @@ func openIsotpInterface(t *testing.T, rxID uint32, txID uint32) socketcan.Socket
 	return dev
 }
 
-func closeIsotpInterface(t *testing.T, dev socketcan.SocketCanInterface) {
+func closeIsotpInterface(t *testing.T, dev socketcan.Interface) {
 	err := dev.Close()
 	if err != nil {
 		t.Errorf("could not close CAN device: %v", err)
