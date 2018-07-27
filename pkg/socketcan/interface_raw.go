@@ -1,8 +1,8 @@
 package socketcan
 
 import (
-	"fmt"
 	"encoding/binary"
+	"fmt"
 
 	"golang.org/x/sys/unix"
 )
@@ -33,7 +33,7 @@ func NewRawInterface(ifName string) (Interface, error) {
 }
 
 func (i Interface) SendFrame(f CanFrame) error {
-	if (i.ifType != IF_TYPE_RAW) {
+	if i.ifType != IF_TYPE_RAW {
 		return fmt.Errorf("interface is not raw type")
 	}
 
@@ -53,7 +53,7 @@ func (i Interface) SendFrame(f CanFrame) error {
 func (i Interface) RecvFrame() (CanFrame, error) {
 	f := CanFrame{}
 
-	if (i.ifType != IF_TYPE_RAW) {
+	if i.ifType != IF_TYPE_RAW {
 		return f, fmt.Errorf("interface is not raw type")
 	}
 
