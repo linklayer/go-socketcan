@@ -71,19 +71,13 @@ func (i Interface) SetLoopback(enable bool) error {
 }
 
 func (i Interface) SetRecvTimeout(timeout time.Duration) error {
-	tv := unix.Timeval{
-		Sec:  int64(timeout / time.Second),
-		Usec: int64(timeout % time.Second / time.Microsecond),
-	}
+	tv := unix.NsecToTimeval(timeout.Nanoseconds())
 	err := unix.SetsockoptTimeval(i.SocketFd, unix.SOL_SOCKET, unix.SO_RCVTIMEO, &tv)
 	return err
 }
 
 func (i Interface) SetSendTimeout(timeout time.Duration) error {
-	tv := unix.Timeval{
-		Sec:  int64(timeout / time.Second),
-		Usec: int64(timeout % time.Second / time.Microsecond),
-	}
+	tv := unix.NsecToTimeval(timeout.Nanoseconds())
 	err := unix.SetsockoptTimeval(i.SocketFd, unix.SOL_SOCKET, unix.SO_SNDTIMEO, &tv)
 	return err
 }
