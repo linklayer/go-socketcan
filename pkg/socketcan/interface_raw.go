@@ -40,7 +40,15 @@ func (i Interface) SendFrame(f CanFrame) error {
 	// assemble a SocketCAN frame
 	frameBytes := make([]byte, 16)
 	// bytes 0-3: arbitration ID
-	binary.LittleEndian.PutUint32(frameBytes[0:4], f.ArbId)
+	if f.ArbId < 0x800 {
+		// standard ID
+		binary.LittleEndian.PutUint32(frameBytes[0:4], f.ArbId)
+	} else {
+		// extended ID
+		// set bit 31 (frame format flag (0 = standard 11 bit, 1 = extended 29 bit)
+		binary.LittleEndian.PutUint32(frameBytes[0:4], f.ArbId|1<<31)
+	}
+
 	// byte 4: data length code
 	frameBytes[4] = f.Dlc
 	// data

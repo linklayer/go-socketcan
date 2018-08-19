@@ -18,8 +18,8 @@ func dataToString(data []byte) string {
 
 func usage() {
 	fmt.Fprintf(flag.CommandLine.Output(),
-			"Usage: %s [interface]\n",
-			os.Args[0])
+		"Usage: %s [interface]\n",
+		os.Args[0])
 	flag.PrintDefaults()
 }
 

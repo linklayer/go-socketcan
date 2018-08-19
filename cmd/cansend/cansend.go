@@ -4,16 +4,16 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
 	"strconv"
+	"strings"
 
 	"github.com/linklayer/go-socketcan/pkg/socketcan"
 )
 
 func usage() {
 	fmt.Fprintf(flag.CommandLine.Output(),
-			"Usage: %s [interface] [arbid]#[data]\n",
-			os.Args[0])
+		"Usage: %s [interface] [arbid]#[data]\n",
+		os.Args[0])
 	flag.PrintDefaults()
 }
 
@@ -26,7 +26,7 @@ func parseFrame(frameStr string) (socketcan.CanFrame, error) {
 	}
 	frame.ArbId = uint32(arbId)
 
-	if len(fields[1]) % 2 != 0 {
+	if len(fields[1])%2 != 0 {
 		return frame, fmt.Errorf("invalid frame bytes")
 	}
 	frame.Dlc = byte(len(fields[1]) / 2)

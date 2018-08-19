@@ -80,7 +80,7 @@ func TestRawRecvTimeout(t *testing.T) {
 func TestRawWrongFunctions(t *testing.T) {
 	dev := openRawInterface(t)
 
-	err := dev.SendBuf([]byte{1,2,3})
+	err := dev.SendBuf([]byte{1, 2, 3})
 	if err == nil {
 		t.Errorf("no error trying to SendBuf with raw interface")
 	}

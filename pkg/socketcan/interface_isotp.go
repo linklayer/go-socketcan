@@ -35,6 +35,19 @@ func NewIsotpInterface(ifName string, rxID uint32, txID uint32) (Interface, erro
 	return canIf, nil
 }
 
+func (i Interface) Rebind(rxID uint32, txID uint32) error {
+	ifIndex, err := getIfIndex(i.SocketFd, i.IfName)
+	if err != nil {
+		return err
+	}
+
+	addr := &unix.SockaddrCAN{Ifindex: ifIndex, RxID: rxID, TxID: txID}
+	if err = unix.Bind(i.SocketFd, addr); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (i Interface) SendBuf(data []byte) error {
 	if i.ifType != IF_TYPE_ISOTP {
 		return fmt.Errorf("interface is not isotp type")
