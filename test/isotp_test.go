@@ -113,3 +113,35 @@ func TestIsotpWrongFunctions(t *testing.T) {
 
 	closeRawInterface(t, dev)
 }
+
+func TestIsotpTxPadding(t *testing.T) {
+	txData := make([]byte, 10)
+	for i := 0; i < 10; i++ {
+		txData[i] = byte(i)
+	}
+
+	txDev := openIsotpInterface(t, 0x100, 0x200)
+	rxDev := openIsotpInterface(t, 0x200, 0x100)
+	txDev.SetTxPadding(true, 0xAA)
+	rxDev.SetTxPadding(true, 0xBB)
+
+	go func() {
+		time.Sleep(50 * time.Millisecond)
+		err := txDev.SendBuf(txData)
+		if err != nil {
+			t.Errorf("error sending frame: %v", err)
+		}
+	}()
+
+	rxData, err := rxDev.RecvBuf()
+	if err != nil {
+		t.Errorf("error receiving frame: %v", err)
+	}
+
+	if !bytes.Equal(rxData, txData) {
+		t.Error("sent and received data does not match")
+	}
+
+	closeIsotpInterface(t, txDev)
+	closeIsotpInterface(t, rxDev)
+}
