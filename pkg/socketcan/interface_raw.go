@@ -74,6 +74,8 @@ func (i Interface) RecvFrame() (CanFrame, error) {
 
 	// bytes 0-3: arbitration ID
 	f.ArbId = uint32(binary.LittleEndian.Uint32(frameBytes[0:4]))
+	// remove bit 31: extended ID flag
+	f.ArbId = f.ArbId & 0x7FFFFFFF
 	// byte 4: data length code
 	f.Dlc = frameBytes[4]
 	// data
